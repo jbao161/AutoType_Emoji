@@ -70,7 +70,7 @@ For emoji_name, emoji_string in userdefined_dictionary
 ; -----------------------------------------------------------------
 paste_string(string){ ; unicode strings don't always type properly in app, but work if copy pasted from clipboard
     clipSave := ClipboardAll
-    Clipboard := string
+    Clipboard = %string%
     Send, ^v
     Sleep 500
     Clipboard := clipSave ; old clipboard contents are restored
