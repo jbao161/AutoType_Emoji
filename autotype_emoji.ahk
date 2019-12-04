@@ -111,10 +111,10 @@ show_description()
     gui, new
     gui, Default
     description_string := ""
-    description_string = %description_string%`nUser defined emotes`n`n
+    description_string = %description_string%User defined emotes`n`n
     for key, value in userdefined_dictionary
         description_string = %description_string%%hotstring_hotkey%%key%         %value%`n
-    description_string = %description_string%ASCII emojis`n`n
+    description_string = %description_string%`nASCII emojis`n`n
     for key, value in emoji_dictionary
         description_string = %description_string%%hotstring_hotkey%%key%         %value%`n
     description_string = %description_string%`nTwitch emotes`n`n
