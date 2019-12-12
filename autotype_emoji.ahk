@@ -15,27 +15,6 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 Menu, Tray, Icon, %A_ScriptDir%\icons\icons8-twitch-64.png
 
 ; -----------------------------------------------------------------
-; Hotstring parameters
-; -----------------------------------------------------------------
-hotstring_hotkey = ?
-    ; prefix to type before the emoji name
-ahk_hotstring_option = :*X: 
-    ; * immediately replace hotstring
-    ; X use function to paste string
-hotstring_prefix = %ahk_hotstring_option%%hotstring_hotkey%
-
-;--------------------------------------------------
-;---- load emoji hotstrings from external database ---------------
-;--------------------------------------------------
-emoji_dictionary := {}
-twitch_dictionary := {}
-userdefined_dictionary := {}
-
-emoji_loadDB("\storage\emoji.db", "emote_storage", "hotstring", "emoji", emoji_dictionary)
-emoji_loadDB("\storage\emoji.db", "twitch_storage", "hotstring", "emoji", twitch_dictionary)
-emoji_loadDB("\storage\emoji.db", "userdefined_storage", "hotstring", "emoji", userdefined_dictionary)
-
-; -----------------------------------------------------------------
 ; ----- add context buttons to the tray menu 
 ; -----------------------------------------------------------------
 Menu, tray, nostandard 
@@ -54,16 +33,45 @@ GroupAdd, TwitchApps, ahk_exe Firefox.exe
 GroupAdd, TwitchApps, ahk_exe notepad.exe ; for testing purposes
 
 ; -----------------------------------------------------------------
+; Hotstring parameters
+; -----------------------------------------------------------------
+hotstring_hotkey = ?
+    ; prefix to type before the emoji name
+; hotstring_end_hotkey = .
+    ; prefix to type before the emoji name
+ahk_hotstring_option = :X: 
+    ; :*X: immediately replace hotstring
+    ; :X: use function to paste string
+hotstring_prefix = %ahk_hotstring_option%%hotstring_hotkey%
+
+;--------------------------------------------------
+;---- load emoji hotstrings from external database ---------------
+;--------------------------------------------------
+emoji_dictionary := {}
+twitch_dictionary := {}
+userdefined_dictionary := {}
+
+emoji_loadDB("\storage\emoji.db", "emote_storage", "hotstring", "emoji", emoji_dictionary)
+emoji_loadDB("\storage\emoji.db", "twitch_storage", "hotstring", "emoji", twitch_dictionary)
+emoji_loadDB("\storage\emoji.db", "userdefined_storage", "hotstring", "emoji", userdefined_dictionary)
+
+; -----------------------------------------------------------------
 ; ----- create the replacement hotstrings 
 ; -----------------------------------------------------------------
-#IfWinActive ahk_group TwitchApps
-For emoji_name, emoji_string in emoji_dictionary
-    Hotstring(hotstring_prefix emoji_name, (Func("paste_string").Bind(emoji_string)))
-For emoji_name, emoji_string in twitch_dictionary
-    Hotstring(hotstring_prefix emoji_name, (Func("paste_string").Bind(emoji_string)))
-For emoji_name, emoji_string in userdefined_dictionary
-    Hotstring(hotstring_prefix emoji_name, (Func("paste_string").Bind(emoji_string)))
-#IfWinActive
+
+For emoji_name, emoji_string in emoji_dictionary{
+    Hotkey, IfWinActive, ahk_group TwitchApps
+    Hotstring(hotstring_prefix emoji_name , (Func("paste_string").Bind(emoji_string)))
+}
+For emoji_name, emoji_string in twitch_dictionary{
+    Hotkey, IfWinActive, ahk_group TwitchApps
+    Hotstring(hotstring_prefix emoji_name , (Func("paste_string").Bind(emoji_string)))
+}
+For emoji_name, emoji_string in userdefined_dictionary{
+    Hotkey, IfWinActive, ahk_group TwitchApps
+    Hotstring(hotstring_prefix emoji_name , (Func("paste_string").Bind(emoji_string)))
+}
+return
 
 ; -----------------------------------------------------------------
 ; ------ inserts unicode emojis from clipboard
@@ -120,9 +128,9 @@ show_description()
     description_string = %description_string%`nTwitch emotes`n`n
     for key, value in twitch_dictionary
         description_string = %description_string%%hotstring_hotkey%%key%         %value%`n    
-    gui, add, edit, readonly vDescription_textbox , %description_string%
+    gui, add, edit, w500 h500 readonly vDescription_textbox , %description_string%
     gui, add, button, gmyguiclose vOKbutton, OK
-    gui, show, , Emoji descriptions
+    gui, show,, Emoji descriptions
     GuiControl, focus, OKbutton ; deselect the text in the edit box
     return winexist()
 
